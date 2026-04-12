@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';">
+<title>Bible Overlay — Display</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --gold: #c9a84c; --gold-light: #e8cc7a; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: transparent !important;
+    overflow: hidden;
+    -webkit-app-region: no-drag;
+  }
+
+  /* ── Verse overlay ───────────────────────────────────────────────────────── */
+  #overlay {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    padding: 50px 80px 60px;
+    background: linear-gradient(
+      to top,
+      rgba(0,0,0,0.90) 0%,
+      rgba(0,0,0,0.60) 65%,
+      transparent 100%
+    );
+    transition: opacity 0.55s ease, transform 0.55s ease;
+    pointer-events: none;
+  }
+  #overlay.hidden {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  #inner { max-width: 1100px; margin: 0 auto; }
+
+  /* Gold decorative line */
+  #inner::before {
+    content: '';
+    display: block;
+    width: 72px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin-bottom: 22px;
+  }
+
+  #verse-text {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 36px;
+    font-style: italic;
+    color: #ffffff;
+    line-height: 1.6;
+    text-shadow:
+      0 2px 30px rgba(0,0,0,0.98),
+      0 0 80px rgba(0,0,0,0.7);
+    margin-bottom: 14px;
+    letter-spacing: 0.01em;
+  }
+
+  #verse-ref {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    color: var(--gold);
+    letter-spacing: 0.14em;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.95);
+  }
+</style>
+</head>
+<body>
+
+<div id="overlay" class="hidden">
+  <div id="inner">
+    <div id="verse-text"></div>
+    <div id="verse-ref"></div>
+  </div>
+</div>
+
+<script>
+const overlay   = document.getElementById('overlay');
+const verseText = document.getElementById('verse-text');
+const verseRef  = document.getElementById('verse-ref');
+
+// ── Listen to commands from main process (via preload) ────────────────────
+window.electronAPI.onCommand((msg) => {
+  switch (msg.type) {
+
+    case 'verse':
+      verseText.textContent = '\u201c' + msg.verse.text + '\u201d';
+      verseRef.textContent  = '\u2014 ' + msg.verse.reference;
+      break;
+
+    case 'show':
+      overlay.classList.remove('hidden');
+      break;
+
+    case 'hide':
+      overlay.classList.add('hidden');
+      break;
+
+    case 'clear':
+      overlay.classList.add('hidden');
+      setTimeout(() => {
+        verseText.textContent = '';
+        verseRef.textContent  = '';
+      }, 560);
+      break;
+
+    case 'size':
+      verseText.style.fontSize = msg.value + 'px';
+      break;
+
+    case 'position':
+      applyPosition(msg.value);
+      break;
+  }
+});
+
+// ── Position logic ────────────────────────────────────────────────────────
+function applyPosition(pos) {
+  const wasHidden = overlay.classList.contains('hidden');
+
+  // Reset
+  overlay.style.top = '';
+  overlay.style.bottom = '';
+  overlay.style.transform = '';
+  overlay.style.padding = '';
+  overlay.style.background = '';
+
+  if (pos === 'bottom') {
+    overlay.style.bottom = '0';
+    overlay.style.padding = '50px 80px 60px';
+    overlay.style.background = 'linear-gradient(to top, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.60) 65%, transparent 100%)';
+  } else if (pos === 'top') {
+    overlay.style.top = '0';
+    overlay.style.padding = '60px 80px 50px';
+    overlay.style.background = 'linear-gradient(to bottom, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.60) 65%, transparent 100%)';
+  } else { // middle
+    overlay.style.top = '50%';
+    overlay.style.transform = 'translateY(-50%)';
+    overlay.style.padding = '48px 80px';
+    overlay.style.background = 'rgba(0,0,0,0.80)';
+  }
+
+  // Restore hidden state after resetting transform
+  if (wasHidden) {
+    overlay.classList.add('hidden');
+  }
+}
+</script>
+</body>
+</html>
