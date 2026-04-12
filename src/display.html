@@ -49,7 +49,7 @@
   #verse-text {
     font-family: 'EB Garamond', Georgia, serif;
     font-size: 36px;
-    font-style: italic;
+    font-style: normal;
     color: #ffffff;
     line-height: 1.6;
     text-shadow:
@@ -87,7 +87,7 @@ window.electronAPI.onCommand((msg) => {
   switch (msg.type) {
 
     case 'verse':
-      verseText.textContent = '\u201c' + msg.verse.text + '\u201d';
+      verseText.textContent = msg.verse.text;
       verseRef.textContent  = '\u2014 ' + msg.verse.reference;
       break;
 

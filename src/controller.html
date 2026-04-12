@@ -1,388 +1,622 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';">
-<title>Bible Overlay — Controller</title>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet"/>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --gold: #c9a84c;
-    --gold-light: #e8cc7a;
-    --bg: #0a0a14;
-    --surface: #111120;
-    --card: rgba(255,255,255,0.04);
-    --border: rgba(201,168,76,0.28);
-    --text: #f0ead8;
-    --muted: rgba(240,234,216,0.48);
-  }
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';"
+        />
+        <title>Bible Overlay — Controller</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            :root {
+                --gold: #c9a84c;
+                --gold-light: #e8cc7a;
+                --bg: #0a0a14;
+                --surface: #111120;
+                --card: rgba(255, 255, 255, 0.04);
+                --border: rgba(201, 168, 76, 0.28);
+                --text: #f0ead8;
+                --muted: rgba(240, 234, 216, 0.48);
+            }
 
-  html, body {
-    height: 100%; background: var(--bg); color: var(--text);
-    font-family: 'EB Garamond', Georgia, serif;
-    user-select: none;
-  }
+            html,
+            body {
+                height: 100%;
+                background: var(--bg);
+                color: var(--text);
+                font-family: "EB Garamond", Georgia, serif;
+                user-select: none;
+            }
 
-  body {
-    display: flex; flex-direction: column;
-    padding: 18px 18px 12px; gap: 12px; overflow-y: auto;
-  }
+            body {
+                display: flex;
+                flex-direction: column;
+                padding: 18px 18px 12px;
+                gap: 12px;
+                overflow: hidden;
+                height: 100%;
+            }
 
-  /* ── Header ── */
-  .app-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding-bottom: 10px; border-bottom: 1px solid var(--border);
-  }
-  .app-title { font-family: 'Cinzel', serif; font-size: 14px; color: var(--gold); letter-spacing: .1em; }
-  .badge-offline {
-    font-size: 9px; font-family: 'Cinzel', serif; letter-spacing: .06em;
-    background: rgba(80,180,80,0.15); border: 1px solid rgba(80,180,80,0.35);
-    color: #80c880; border-radius: 20px; padding: 3px 9px;
-  }
+            /* ── Header ── */
+            .app-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding-bottom: 10px;
+                border-bottom: 1px solid var(--border);
+            }
+            .app-title {
+                font-family: "Cinzel", serif;
+                font-size: 14px;
+                color: var(--gold);
+                letter-spacing: 0.1em;
+            }
+            /* ── Connection row ── */
+            .conn-row {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 12px;
+                color: var(--muted);
+            }
+            .dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                background: #444;
+                flex-shrink: 0;
+                transition:
+                    background 0.4s,
+                    box-shadow 0.4s;
+            }
+            .dot.on {
+                background: #80c880;
+                box-shadow: 0 0 7px #80c880;
+            }
+            .dot.pulse {
+                animation: pulse 1.8s infinite;
+                background: var(--gold);
+            }
+            @keyframes pulse {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.3;
+                }
+            }
 
-  /* ── Connection row ── */
-  .conn-row {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 12px; color: var(--muted);
-  }
-  .dot {
-    width: 9px; height: 9px; border-radius: 50%;
-    background: #444; flex-shrink: 0; transition: background .4s, box-shadow .4s;
-  }
-  .dot.on { background: #80c880; box-shadow: 0 0 7px #80c880; }
-  .dot.pulse { animation: pulse 1.8s infinite; background: var(--gold); }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+            /* ── Cards ── */
+            .card {
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 14px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .card-title {
+                font-family: "Cinzel", serif;
+                font-size: 10px;
+                color: var(--muted);
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
+            .card-title.collapsible {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: pointer;
+                user-select: none;
+            }
+            .card-title.collapsible:hover {
+                color: var(--text);
+            }
+            .collapse-arrow {
+                font-size: 9px;
+                transition: transform 0.2s;
+            }
+            .card-title.collapsible.open .collapse-arrow {
+                transform: rotate(180deg);
+            }
+            .collapsible-body {
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .collapsible-body.collapsed {
+                display: none;
+            }
 
-  /* ── Cards ── */
-  .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px; display: flex;
-    flex-direction: column; gap: 10px;
-  }
-  .card-title {
-    font-family: 'Cinzel', serif; font-size: 10px; color: var(--muted);
-    letter-spacing: .1em; text-transform: uppercase;
-  }
+            /* ── Inputs ── */
+            .input-row {
+                display: flex;
+                gap: 8px;
+            }
+            input[type="text"] {
+                flex: 1;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid var(--border);
+                border-radius: 7px;
+                padding: 9px 13px;
+                color: var(--text);
+                font-family: "EB Garamond", serif;
+                font-size: 16px;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+            input::placeholder {
+                color: var(--muted);
+            }
+            input:focus {
+                border-color: var(--gold);
+            }
 
-  /* ── Inputs ── */
-  .input-row { display: flex; gap: 8px; }
-  input[type=text] {
-    flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-    border-radius: 7px; padding: 9px 13px; color: var(--text);
-    font-family: 'EB Garamond', serif; font-size: 16px; outline: none;
-    transition: border-color .2s;
-  }
-  input::placeholder { color: var(--muted); }
-  input:focus { border-color: var(--gold); }
+            select {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid var(--border);
+                border-radius: 7px;
+                padding: 7px 12px;
+                color: var(--text);
+                font-family: "Cinzel", serif;
+                font-size: 11px;
+                outline: none;
+                cursor: pointer;
+                width: 100%;
+            }
+            select option {
+                background: #111;
+            }
 
-  select {
-    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-    border-radius: 7px; padding: 7px 12px; color: var(--text);
-    font-family: 'Cinzel', serif; font-size: 11px; outline: none;
-    cursor: pointer; width: 100%;
-  }
-  select option { background: #111; }
+            /* ── Buttons ── */
+            .btn {
+                border: none;
+                cursor: pointer;
+                border-radius: 7px;
+                font-family: "Cinzel", serif;
+                font-size: 11px;
+                letter-spacing: 0.05em;
+                padding: 9px 16px;
+                transition: all 0.18s;
+                white-space: nowrap;
+            }
+            .btn-gold {
+                background: linear-gradient(135deg, var(--gold), #a8762e);
+                color: #080808;
+                font-weight: 600;
+            }
+            .btn-gold:hover {
+                filter: brightness(1.15);
+            }
 
-  /* ── Buttons ── */
-  .btn {
-    border: none; cursor: pointer; border-radius: 7px;
-    font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: .05em;
-    padding: 9px 16px; transition: all .18s; white-space: nowrap;
-  }
-  .btn-gold { background: linear-gradient(135deg, var(--gold), #a8762e); color: #080808; font-weight: 600; }
-  .btn-gold:hover { filter: brightness(1.15); }
-  .btn-show { background: rgba(80,160,80,0.2); border: 1px solid rgba(80,160,80,0.4); color: #90d890; }
-  .btn-show:hover { background: rgba(80,160,80,0.38); }
-  .btn-hide { background: rgba(255,255,255,0.07); border: 1px solid var(--border); color: var(--text); }
-  .btn-hide:hover { background: rgba(255,255,255,0.13); border-color: var(--gold); }
-  .btn-clear { background: rgba(180,50,50,0.2); border: 1px solid rgba(180,50,50,0.38); color: #f09090; }
-  .btn-clear:hover { background: rgba(180,50,50,0.4); }
+            /* ── Status ── */
+            #status {
+                font-size: 13px;
+                color: var(--muted);
+                text-align: center;
+                min-height: 18px;
+            }
+            #status.ok {
+                color: #80c880;
+            }
+            #status.error {
+                color: #f08080;
+            }
 
-  .btn-row { display: flex; gap: 8px; }
-  .btn-row .btn { flex: 1; }
+            /* ── Size slider ── */
+            .slider-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .slider-row label {
+                font-size: 12px;
+                color: var(--muted);
+                white-space: nowrap;
+            }
+            input[type="range"] {
+                flex: 1;
+                accent-color: var(--gold);
+                cursor: pointer;
+            }
 
-  /* ── Status ── */
-  #status { font-size: 13px; color: var(--muted); text-align: center; min-height: 18px; }
-  #status.ok { color: #80c880; }
-  #status.error { color: #f08080; }
+            /* ── Position buttons ── */
+            .pos-row {
+                display: flex;
+                gap: 6px;
+            }
+            .pos-btn {
+                flex: 1;
+                font-size: 11px;
+                padding: 7px;
+                text-align: center;
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                color: var(--muted);
+                cursor: pointer;
+                transition: all 0.18s;
+                font-family: "Cinzel", serif;
+            }
+            .pos-btn.active {
+                background: rgba(201, 168, 76, 0.18);
+                border-color: var(--gold);
+                color: var(--gold);
+            }
+            .pos-btn:hover:not(.active) {
+                background: rgba(255, 255, 255, 0.08);
+            }
 
-  /* ── Preview ── */
-  #preview {
-    background: rgba(0,0,0,0.35); border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px 14px; min-height: 68px;
-    display: flex; flex-direction: column; justify-content: center;
-  }
-  #preview-empty { color: var(--muted); font-size: 13px; text-align: center; }
-  #preview-text { font-style: italic; font-size: 14px; line-height: 1.5; color: var(--text); display: none; }
-  #preview-ref { font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold); margin-top: 6px; letter-spacing: .07em; display: none; }
+            /* ── Loaded Verses ── */
+            #loaded-card {
+                flex: 1;
+                min-height: 0;
+            }
+            #loaded {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                width: 100%;
+            }
+            #loaded:empty::after {
+                content: "No loaded verses yet";
+                display: block;
+                font-size: 12px;
+                color: var(--muted);
+                text-align: center;
+                padding: 8px;
+            }
+            .ri {
+                display: flex;
+                flex-direction: row;
+                align-items: baseline;
+                gap: 8px;
+                padding: 6px 9px;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background 0.15s;
+                font-size: 13px;
+                color: var(--muted);
+            }
+            .ri:hover {
+                background: rgba(201, 168, 76, 0.1);
+                color: var(--gold-light);
+            }
+            .ri.active {
+                background: rgba(80, 160, 80, 0.15);
+                border: 1px solid rgba(80, 160, 80, 0.35);
+                color: #90d890;
+            }
+            .ri-ref {
+                font-family: "Cinzel", serif;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            .ri-preview {
+                font-size: 14px;
+                opacity: 1;
+                line-height: 1.4;
+                white-space: nowrap;
+                overflow: hidden;
+                flex: 1;
+                min-width: 0;
+                text-overflow: ellipsis;
+            }
 
-  /* ── Size slider ── */
-  .slider-row { display: flex; align-items: center; gap: 10px; }
-  .slider-row label { font-size: 12px; color: var(--muted); white-space: nowrap; }
-  input[type=range] { flex: 1; accent-color: var(--gold); cursor: pointer; }
+            /* ── Display screen picker ── */
+            .screen-row {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+            .screen-row label {
+                font-size: 12px;
+                color: var(--muted);
+                white-space: nowrap;
+            }
+            .screen-row select {
+                flex: 1;
+            }
 
-  /* ── Position buttons ── */
-  .pos-row { display: flex; gap: 6px; }
-  .pos-btn {
-    flex: 1; font-size: 11px; padding: 7px; text-align: center;
-    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-    border-radius: 6px; color: var(--muted); cursor: pointer;
-    transition: all .18s; font-family: 'Cinzel', serif;
-  }
-  .pos-btn.active { background: rgba(201,168,76,0.18); border-color: var(--gold); color: var(--gold); }
-  .pos-btn:hover:not(.active) { background: rgba(255,255,255,0.08); }
+            /* ── Hint ── */
+            .hint {
+                font-size: 11px;
+                color: var(--muted);
+                text-align: center;
+                opacity: 0.6;
+                padding-bottom: 4px;
+            }
+            kbd {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 3px;
+                padding: 1px 5px;
+                font-size: 10px;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Header -->
+        <div class="app-header">
+            <span class="app-title">✝ Bible Overlay</span>
+        </div>
 
-  /* ── Recent ── */
-  #recent { display: flex; flex-direction: column; gap: 3px; max-height: 150px; overflow-y: auto; }
-  #recent:empty::after {
-    content: 'No recent verses yet'; display: block;
-    font-size: 12px; color: var(--muted); text-align: center; padding: 8px;
-  }
-  .ri {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 5px 9px; border-radius: 5px; cursor: pointer;
-    transition: background .15s; font-size: 13px; color: var(--muted);
-  }
-  .ri:hover { background: rgba(201,168,76,0.1); color: var(--gold-light); }
-  .ri-ref { font-family: 'Cinzel', serif; font-size: 11px; flex-shrink: 0; }
-  .ri-preview { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 190px; opacity: .55; margin-left: 8px; }
+        <!-- Display Settings -->
+        <div class="card">
+            <div class="card-title collapsible" id="settings-toggle">
+                Display Settings
+                <span class="collapse-arrow">▼</span>
+            </div>
+            <div class="collapsible-body collapsed" id="settings-body">
+                <div class="conn-row">
+                    <div class="dot pulse" id="conn-dot"></div>
+                    <span id="conn-label">Display window loading…</span>
+                </div>
+                <div class="screen-row">
+                    <label>Projector on:</label>
+                    <select id="screen-select"></select>
+                </div>
+                <div class="slider-row">
+                    <label>Text size</label>
+                    <input
+                        type="range"
+                        id="size-slider"
+                        min="18"
+                        max="72"
+                        value="40"
+                    />
+                    <label id="size-label">40px</label>
+                </div>
+                <div class="pos-row">
+                    <button class="pos-btn active" data-pos="bottom">
+                        ⬇ Bottom
+                    </button>
+                    <button class="pos-btn" data-pos="middle">⬛ Middle</button>
+                    <button class="pos-btn" data-pos="top">⬆ Top</button>
+                </div>
+            </div>
+        </div>
 
-  /* ── Display screen picker ── */
-  .screen-row { display: flex; gap: 8px; align-items: center; }
-  .screen-row label { font-size: 12px; color: var(--muted); white-space: nowrap; }
-  .screen-row select { flex: 1; }
+        <!-- Load verse -->
+        <div class="card">
+            <div class="card-title">Verse Reference</div>
+            <div class="input-row">
+                <input
+                    id="ref-input"
+                    type="text"
+                    placeholder="John 3:16  ·  Psalm 23:1-3  ·  Gen 1:1"
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+                <button class="btn btn-gold" id="load-btn">Load</button>
+            </div>
+            <div id="status"></div>
+        </div>
 
-  /* ── Hint ── */
-  .hint { font-size: 11px; color: var(--muted); text-align: center; opacity: .6; padding-bottom: 4px; }
-  kbd {
-    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 3px; padding: 1px 5px; font-size: 10px; font-family: monospace;
-  }
-</style>
-</head>
-<body>
+        <!-- Loaded Verses -->
+        <div class="card" id="loaded-card">
+            <div class="card-title">Loaded Verses</div>
+            <div id="loaded"></div>
+        </div>
 
-<!-- Header -->
-<div class="app-header">
-  <span class="app-title">✝ Bible Overlay</span>
-  <span class="badge-offline">KJV · OFFLINE</span>
-</div>
+        <div class="hint"><kbd>Enter</kbd> load</div>
 
-<!-- Connection status -->
-<div class="conn-row">
-  <div class="dot pulse" id="conn-dot"></div>
-  <span id="conn-label">Display window loading…</span>
-</div>
+        <!-- Bible data -->
+        <script src="bible-data.js"></script>
+        <script src="bible-parser.js"></script>
+        <script>
+            // ── State ──────────────────────────────────────────────────────────────────
+            let currentVerse = null;
+            let loadedVerses = [];
+            let verseVisible = false;
 
-<!-- Screen picker -->
-<div class="card">
-  <div class="card-title">Display Screen</div>
-  <div class="screen-row">
-    <label>Projector on:</label>
-    <select id="screen-select"></select>
-  </div>
-</div>
+            // ── Screen picker ──────────────────────────────────────────────────────────
+            async function loadScreens() {
+                const displays = await window.electronAPI.getDisplays();
+                const sel = document.getElementById("screen-select");
+                sel.innerHTML = "";
+                displays.forEach((d) => {
+                    const opt = document.createElement("option");
+                    opt.value = d.id;
+                    opt.textContent = d.isPrimary
+                        ? `${d.label} (Primary)`
+                        : d.label;
+                    if (!d.isPrimary) opt.selected = true; // default to secondary
+                    sel.appendChild(opt);
+                });
+            }
+            loadScreens();
 
-<!-- Load verse -->
-<div class="card">
-  <div class="card-title">Verse Reference</div>
-  <div class="input-row">
-    <input id="ref-input" type="text" placeholder="John 3:16  ·  Psalm 23:1-3  ·  Gen 1:1" autocomplete="off" spellcheck="false"/>
-    <button class="btn btn-gold" id="load-btn">Load</button>
-  </div>
-  <div id="status">31,102 KJV verses ready</div>
-</div>
+            document
+                .getElementById("screen-select")
+                .addEventListener("change", function () {
+                    window.electronAPI.sendCommand({
+                        type: "move-display",
+                        displayId: parseInt(this.value),
+                    });
+                });
 
-<!-- Preview -->
-<div class="card">
-  <div class="card-title">Preview</div>
-  <div id="preview">
-    <div id="preview-empty">No verse loaded</div>
-    <div id="preview-text"></div>
-    <div id="preview-ref"></div>
-  </div>
-</div>
+            // ── Connection dot ─────────────────────────────────────────────────────────
+            // The display window is always open (managed by main.js), so just mark connected after short delay
+            setTimeout(() => {
+                document.getElementById("conn-dot").classList.remove("pulse");
+                document.getElementById("conn-dot").classList.add("on");
+                document.getElementById("conn-label").textContent =
+                    "Display window active ✓";
+            }, 1200);
 
-<!-- Controls -->
-<div class="card">
-  <div class="card-title">Display Controls</div>
-  <div class="btn-row">
-    <button class="btn btn-show" id="show-btn">▶ Show <kbd>Space</kbd></button>
-    <button class="btn btn-hide" id="hide-btn">◼ Hide <kbd>H</kbd></button>
-    <button class="btn btn-clear" id="clear-btn">✕ Clear</button>
-  </div>
+            // ── Load verse ─────────────────────────────────────────────────────────────
+            function loadVerse() {
+                const raw = document.getElementById("ref-input").value.trim();
+                if (!raw) {
+                    setStatus("Enter a verse reference", "error");
+                    return;
+                }
 
-  <div class="slider-row">
-    <label>Text size</label>
-    <input type="range" id="size-slider" min="18" max="72" value="36"/>
-    <label id="size-label">36px</label>
-  </div>
+                const results = parseRefs(raw);
+                if (!results) {
+                    setStatus(
+                        'Not found — try "John 3:16" or "Ps 23:1"',
+                        "error",
+                    );
+                    return;
+                }
 
-  <div class="pos-row">
-    <button class="pos-btn active" data-pos="bottom">⬇ Bottom</button>
-    <button class="pos-btn" data-pos="middle">⬛ Middle</button>
-    <button class="pos-btn" data-pos="top">⬆ Top</button>
-  </div>
-</div>
+                results
+                    .slice()
+                    .reverse()
+                    .forEach((r) => addToLoaded(r));
+                currentVerse = results[0];
+                setStatus(
+                    "✓ " +
+                        results.map((r) => r.reference).join(", ") +
+                        " — select the loaded verse to display",
+                    "ok",
+                );
+            }
 
-<!-- Recent -->
-<div class="card">
-  <div class="card-title">Recent Verses</div>
-  <div id="recent"></div>
-</div>
+            // ── Controls ───────────────────────────────────────────────────────────────
+            function hideVerse() {
+                window.electronAPI.sendCommand({ type: "hide" });
+                verseVisible = false;
+                renderLoaded();
+            }
 
-<div class="hint"><kbd>Enter</kbd> load &nbsp;·&nbsp; <kbd>Space</kbd> show/hide &nbsp;·&nbsp; <kbd>H</kbd> hide</div>
+            // ── Size ───────────────────────────────────────────────────────────────────
+            document
+                .getElementById("size-slider")
+                .addEventListener("input", function () {
+                    document.getElementById("size-label").textContent =
+                        this.value + "px";
+                    window.electronAPI.sendCommand({
+                        type: "size",
+                        value: parseInt(this.value),
+                    });
+                });
 
-<!-- Bible data -->
-<script src="bible-data.js"></script>
-<script src="bible-parser.js"></script>
-<script>
-// ── State ──────────────────────────────────────────────────────────────────
-let currentVerse = null;
-let recentVerses = [];
-let verseVisible = false;
+            // ── Position ───────────────────────────────────────────────────────────────
+            document.querySelectorAll(".pos-btn").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    document
+                        .querySelectorAll(".pos-btn")
+                        .forEach((b) => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    window.electronAPI.sendCommand({
+                        type: "position",
+                        value: btn.dataset.pos,
+                    });
+                });
+            });
 
-// ── Screen picker ──────────────────────────────────────────────────────────
-async function loadScreens() {
-  const displays = await window.electronAPI.getDisplays();
-  const sel = document.getElementById('screen-select');
-  sel.innerHTML = '';
-  displays.forEach(d => {
-    const opt = document.createElement('option');
-    opt.value = d.id;
-    opt.textContent = d.isPrimary ? `${d.label} (Primary)` : d.label;
-    if (!d.isPrimary) opt.selected = true; // default to secondary
-    sel.appendChild(opt);
-  });
-}
-loadScreens();
+            // ── Loaded Verses ──────────────────────────────────────────────────────────
+            function addToLoaded(verse) {
+                loadedVerses = loadedVerses.filter(
+                    (v) => v.reference !== verse.reference,
+                );
+                loadedVerses.unshift(verse);
+                if (loadedVerses.length > 30) loadedVerses.pop();
+                renderLoaded();
+            }
+            function renderLoaded() {
+                const el = document.getElementById("loaded");
+                el.innerHTML = "";
+                loadedVerses.forEach((v) => {
+                    const div = document.createElement("div");
+                    div.className =
+                        "ri" +
+                        (verseVisible &&
+                        currentVerse &&
+                        currentVerse.reference === v.reference
+                            ? " active"
+                            : "");
+                    div.innerHTML = `<span class="ri-ref">${v.reference}</span><span class="ri-preview">${v.text}</span>`;
+                    div.addEventListener("click", () => {
+                        if (
+                            currentVerse &&
+                            currentVerse.reference === v.reference &&
+                            verseVisible
+                        ) {
+                            hideVerse();
+                        } else {
+                            currentVerse = v;
+                            window.electronAPI.sendCommand({
+                                type: "verse",
+                                verse: v,
+                            });
+                            window.electronAPI.sendCommand({ type: "show" });
+                            verseVisible = true;
+                            renderLoaded();
+                        }
+                    });
+                    el.appendChild(div);
+                });
+            }
 
-document.getElementById('screen-select').addEventListener('change', function() {
-  window.electronAPI.sendCommand({ type: 'move-display', displayId: parseInt(this.value) });
-});
+            // ── Status ─────────────────────────────────────────────────────────────────
+            let statusTimer = null;
+            function setStatus(msg, type) {
+                const el = document.getElementById("status");
+                el.textContent = msg;
+                el.className = type || "";
+                clearTimeout(statusTimer);
+                if (type === "ok") {
+                    statusTimer = setTimeout(() => {
+                        el.textContent = "";
+                        el.className = "";
+                    }, 3000);
+                }
+            }
 
-// ── Connection dot ─────────────────────────────────────────────────────────
-// The display window is always open (managed by main.js), so just mark connected after short delay
-setTimeout(() => {
-  document.getElementById('conn-dot').classList.remove('pulse');
-  document.getElementById('conn-dot').classList.add('on');
-  document.getElementById('conn-label').textContent = 'Display window active ✓';
-}, 1200);
+            // ── Wire up buttons ────────────────────────────────────────────────────────
+            document
+                .getElementById("load-btn")
+                .addEventListener("click", loadVerse);
 
-// ── Load verse ─────────────────────────────────────────────────────────────
-function loadVerse() {
-  const raw = document.getElementById('ref-input').value.trim();
-  if (!raw) { setStatus('Enter a verse reference', 'error'); return; }
+            // ── Keyboard shortcuts ─────────────────────────────────────────────────────
+            document.addEventListener("keydown", (e) => {
+                const typing = ["INPUT", "SELECT", "TEXTAREA"].includes(
+                    e.target.tagName,
+                );
+                if (typing) {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        loadVerse();
+                    }
+                    return;
+                }
+                if (e.key === "Enter") loadVerse();
+            });
 
-  const result = parseRef(raw);
-  if (!result) { setStatus('Not found — try "John 3:16" or "Ps 23:1"', 'error'); return; }
+            document.getElementById("ref-input").focus();
 
-  currentVerse = result;
-  updatePreview(result);
-  addToRecent(result);
-  setStatus('✓ ' + result.reference, 'ok');
-
-  window.electronAPI.sendCommand({ type: 'verse', verse: result });
-  window.electronAPI.sendCommand({ type: 'show' });
-  verseVisible = true;
-}
-
-function updatePreview(verse) {
-  document.getElementById('preview-empty').style.display = 'none';
-  const pt = document.getElementById('preview-text');
-  const pr = document.getElementById('preview-ref');
-  pt.style.display = '';
-  pt.textContent = '\u201c' + verse.text.substring(0, 120) + (verse.text.length > 120 ? '\u2026' : '') + '\u201d';
-  pr.style.display = '';
-  pr.textContent = '\u2014 ' + verse.reference;
-}
-
-// ── Controls ───────────────────────────────────────────────────────────────
-function showVerse() {
-  if (!currentVerse) { setStatus('Load a verse first', 'error'); return; }
-  window.electronAPI.sendCommand({ type: 'show' });
-  verseVisible = true;
-}
-function hideVerse() {
-  window.electronAPI.sendCommand({ type: 'hide' });
-  verseVisible = false;
-}
-function clearVerse() {
-  window.electronAPI.sendCommand({ type: 'clear' });
-  currentVerse = null; verseVisible = false;
-  document.getElementById('preview-empty').style.display = '';
-  document.getElementById('preview-text').style.display = 'none';
-  document.getElementById('preview-ref').style.display = 'none';
-  document.getElementById('ref-input').value = '';
-  setStatus('');
-}
-function toggleVerse() { verseVisible ? hideVerse() : showVerse(); }
-
-// ── Size ───────────────────────────────────────────────────────────────────
-document.getElementById('size-slider').addEventListener('input', function() {
-  document.getElementById('size-label').textContent = this.value + 'px';
-  window.electronAPI.sendCommand({ type: 'size', value: parseInt(this.value) });
-});
-
-// ── Position ───────────────────────────────────────────────────────────────
-document.querySelectorAll('.pos-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    window.electronAPI.sendCommand({ type: 'position', value: btn.dataset.pos });
-  });
-});
-
-// ── Recent ─────────────────────────────────────────────────────────────────
-function addToRecent(verse) {
-  recentVerses = recentVerses.filter(v => v.reference !== verse.reference);
-  recentVerses.unshift(verse);
-  if (recentVerses.length > 12) recentVerses.pop();
-  renderRecent();
-}
-function renderRecent() {
-  const el = document.getElementById('recent');
-  el.innerHTML = '';
-  recentVerses.forEach(v => {
-    const div = document.createElement('div');
-    div.className = 'ri';
-    div.innerHTML = `<span class="ri-ref">${v.reference}</span><span class="ri-preview">${v.text.substring(0,45)}\u2026</span>`;
-    div.addEventListener('click', () => {
-      currentVerse = v;
-      updatePreview(v);
-      document.getElementById('ref-input').value = v.reference.replace(' (KJV)', '');
-      setStatus('\u2713 ' + v.reference, 'ok');
-      window.electronAPI.sendCommand({ type: 'verse', verse: v });
-      window.electronAPI.sendCommand({ type: 'show' });
-      verseVisible = true;
-    });
-    el.appendChild(div);
-  });
-}
-
-// ── Status ─────────────────────────────────────────────────────────────────
-function setStatus(msg, type) {
-  const el = document.getElementById('status');
-  el.textContent = msg; el.className = type || '';
-}
-
-// ── Wire up buttons ────────────────────────────────────────────────────────
-document.getElementById('load-btn').addEventListener('click', loadVerse);
-document.getElementById('show-btn').addEventListener('click', showVerse);
-document.getElementById('hide-btn').addEventListener('click', hideVerse);
-document.getElementById('clear-btn').addEventListener('click', clearVerse);
-
-// ── Keyboard shortcuts ─────────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  const typing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName);
-  if (typing) { if (e.key === 'Enter') { e.preventDefault(); loadVerse(); } return; }
-  if (e.code === 'Space') { e.preventDefault(); toggleVerse(); }
-  if (e.key === 'h' || e.key === 'H') hideVerse();
-  if (e.key === 'Enter') loadVerse();
-});
-
-document.getElementById('ref-input').focus();
-</script>
-</body>
+            // ── Collapsible display settings ───────────────────────────────────────────
+            document
+                .getElementById("settings-toggle")
+                .addEventListener("click", () => {
+                    const toggle = document.getElementById("settings-toggle");
+                    const body = document.getElementById("settings-body");
+                    const open = !body.classList.contains("collapsed");
+                    body.classList.toggle("collapsed", open);
+                    toggle.classList.toggle("open", !open);
+                });
+        </script>
+    </body>
 </html>

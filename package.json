@@ -1,7 +1,7 @@
 {
   "name": "bible-overlay",
   "version": "1.0.0",
-  "description": "KJV Bible verse overlay for church PowerPoint presentations",
+  "description": "Bible verse overlay for church PowerPoint presentations",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",

@@ -3,7 +3,7 @@ title Bible Overlay Setup
 color 0A
 echo.
 echo  ============================================
-echo    Bible Overlay - KJV (Offline)
+echo    Bible Overlay
 echo  ============================================
 echo.
 

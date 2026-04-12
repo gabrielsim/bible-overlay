@@ -1,7 +1,7 @@
 #!/bin/bash
 echo ""
 echo "  ============================================"
-echo "    Bible Overlay - KJV (Offline)"
+echo "    Bible Overlay"
 echo "  ============================================"
 echo ""
 
