@@ -4,6 +4,9 @@ on:
     release:
         types: [created]
 
+permissions:
+    contents: write
+
 jobs:
     build:
         strategy:
@@ -25,7 +28,7 @@ jobs:
 
             - run: npm ci
 
-            - run: npm run ${{ matrix.script }}
+            - run: npm run ${{ matrix.script }} -- --publish never
 
             - name: Upload to release
               uses: softprops/action-gh-release@v2
