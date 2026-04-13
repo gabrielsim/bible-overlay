@@ -425,6 +425,7 @@
         <script>
             // ── State ──────────────────────────────────────────────────────────────────
             let currentVerse = null;
+            let displayedVerse = null;
             let loadedVerses = [];
             let verseVisible = false;
 
@@ -497,6 +498,7 @@
             function hideVerse() {
                 window.electronAPI.sendCommand({ type: "hide" });
                 verseVisible = false;
+                displayedVerse = null;
                 renderLoaded();
             }
 
@@ -550,13 +552,14 @@
                     div.innerHTML = `<span class="ri-ref">${v.reference}</span><span class="ri-preview">${v.text}</span>`;
                     div.addEventListener("click", () => {
                         if (
-                            currentVerse &&
-                            currentVerse.reference === v.reference &&
+                            displayedVerse &&
+                            displayedVerse.reference === v.reference &&
                             verseVisible
                         ) {
                             hideVerse();
                         } else {
                             currentVerse = v;
+                            displayedVerse = v;
                             window.electronAPI.sendCommand({
                                 type: "verse",
                                 verse: v,

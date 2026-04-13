@@ -117,6 +117,7 @@ ipcMain.handle('get-displays', () => {
 
 // ── App lifecycle ─────────────────────────────────────────────────────────────
 app.whenReady().then(() => {
+  if (isMac) app.dock.show();
   createWindows();
 
   app.on('activate', () => {
