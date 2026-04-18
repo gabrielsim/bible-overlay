@@ -449,21 +449,28 @@
                 const displays = await window.electronAPI.getDisplays();
                 const sel = document.getElementById("screen-select");
                 sel.innerHTML = "";
+                const savedDisplayId = localStorage.getItem("displayId");
                 displays.forEach((d) => {
                     const opt = document.createElement("option");
                     opt.value = d.id;
                     opt.textContent = d.isPrimary
                         ? `${d.label} (Primary)`
                         : d.label;
-                    if (!d.isPrimary) opt.selected = true; // default to secondary
+                    if (savedDisplayId ? String(d.id) === savedDisplayId : !d.isPrimary)
+                        opt.selected = true;
                     sel.appendChild(opt);
                 });
+                const selectedId = parseInt(sel.value);
+                if (selectedId) {
+                    window.electronAPI.sendCommand({ type: "move-display", displayId: selectedId });
+                }
             }
             loadScreens();
 
             document
                 .getElementById("screen-select")
                 .addEventListener("change", function () {
+                    localStorage.setItem("displayId", this.value);
                     window.electronAPI.sendCommand({
                         type: "move-display",
                         displayId: parseInt(this.value),
@@ -519,11 +526,20 @@
             }
 
             // ── Size ───────────────────────────────────────────────────────────────────
+            const savedSize = localStorage.getItem("textSize");
+            if (savedSize) {
+                const slider = document.getElementById("size-slider");
+                slider.value = savedSize;
+                document.getElementById("size-label").textContent = savedSize + "px";
+                window.electronAPI.sendCommand({ type: "size", value: parseInt(savedSize) });
+            }
+
             document
                 .getElementById("size-slider")
                 .addEventListener("input", function () {
                     document.getElementById("size-label").textContent =
                         this.value + "px";
+                    localStorage.setItem("textSize", this.value);
                     window.electronAPI.sendCommand({
                         type: "size",
                         value: parseInt(this.value),
