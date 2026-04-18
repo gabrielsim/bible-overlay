@@ -21,12 +21,7 @@
     position: fixed;
     bottom: 0; left: 0; right: 0;
     padding: 50px 80px 60px;
-    background: linear-gradient(
-      to top,
-      rgba(0,0,0,0.90) 0%,
-      rgba(0,0,0,0.60) 65%,
-      transparent 100%
-    );
+    background: rgba(0,0,0,0.88);
     transition: opacity 0.55s ease, transform 0.55s ease;
     pointer-events: none;
   }
@@ -48,7 +43,7 @@
 
   #verse-text {
     font-family: 'EB Garamond', Georgia, serif;
-    font-size: 36px;
+    font-size: 45px;
     font-style: normal;
     color: #ffffff;
     line-height: 1.6;
@@ -61,7 +56,8 @@
 
   #verse-ref {
     font-family: 'Cinzel', serif;
-    font-size: 18px;
+    font-size: 32px;
+    font-weight: bold;
     color: var(--gold);
     letter-spacing: 0.14em;
     text-shadow: 0 2px 14px rgba(0,0,0,0.95);
@@ -131,16 +127,16 @@ function applyPosition(pos) {
   if (pos === 'bottom') {
     overlay.style.bottom = '0';
     overlay.style.padding = '50px 80px 60px';
-    overlay.style.background = 'linear-gradient(to top, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.60) 65%, transparent 100%)';
+    overlay.style.background = 'rgba(0,0,0,0.88)';
   } else if (pos === 'top') {
     overlay.style.top = '0';
     overlay.style.padding = '60px 80px 50px';
-    overlay.style.background = 'linear-gradient(to bottom, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.60) 65%, transparent 100%)';
+    overlay.style.background = 'rgba(0,0,0,0.88)';
   } else { // middle
     overlay.style.top = '50%';
     overlay.style.transform = 'translateY(-50%)';
     overlay.style.padding = '48px 80px';
-    overlay.style.background = 'rgba(0,0,0,0.80)';
+    overlay.style.background = 'rgba(0,0,0,0.88)';
   }
 
   // Restore hidden state after resetting transform
