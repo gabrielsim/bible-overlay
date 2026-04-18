@@ -1,6 +1,26 @@
 // Shared Bible reference parser
 // Supports: "John 3:16", "Ps 23:1-3", "Gen 1", "1 Cor 13:4-7", "Gen 1:1,3", etc.
 
+const ABBREVS = {
+  'Genesis': 'Gen.', 'Exodus': 'Ex.', 'Leviticus': 'Lev.', 'Numbers': 'Num.',
+  'Deuteronomy': 'Deut.', 'Joshua': 'Josh.', 'Judges': 'Judg.', 'Ruth': 'Ruth',
+  '1 Samuel': '1 Sam.', '2 Samuel': '2 Sam.', '1 Kings': '1 Kings', '2 Kings': '2 Kings',
+  '1 Chronicles': '1 Chron.', '2 Chronicles': '2 Chron.', 'Ezra': 'Ezra', 'Nehemiah': 'Neh.',
+  'Esther': 'Est.', 'Job': 'Job', 'Psalms': 'Ps.', 'Proverbs': 'Prov',
+  'Ecclesiastes': 'Eccles.', 'Song of Solomon': 'Song', 'Isaiah': 'Isa.',
+  'Jeremiah': 'Jer.', 'Lamentations': 'Lam.', 'Ezekiel': 'Ezek.', 'Daniel': 'Dan.',
+  'Hosea': 'Hos.', 'Joel': 'Joel', 'Amos': 'Amos', 'Obadiah': 'Obad.',
+  'Jonah': 'Jonah', 'Micah': 'Mic.', 'Nahum': 'Nah.', 'Habakkuk': 'Hab.',
+  'Zephaniah': 'Zeph.', 'Haggai': 'Hag.', 'Zechariah': 'Zech.', 'Malachi': 'Mal.',
+  'Matthew': 'Matt.', 'Mark': 'Mark', 'Luke': 'Luke', 'John': 'John',
+  'Acts': 'Acts', 'Romans': 'Rom.', '1 Corinthians': '1 Cor.', '2 Corinthians': '2 Cor.',
+  'Galatians': 'Gal.', 'Ephesians': 'Eph.', 'Philippians': 'Phil.', 'Colossians': 'Col.',
+  '1 Thessalonians': '1 Thess.', '2 Thessalonians': '2 Thess.', '1 Timothy': '1 Tim.',
+  '2 Timothy': '2 Tim.', 'Titus': 'Titus', 'Philemon': 'Philem.', 'Hebrews': 'Heb.',
+  'James': 'James', '1 Peter': '1 Pet.', '2 Peter': '2 Pet.', '1 John': '1 John',
+  '2 John': '2 John', '3 John': '3 John', 'Jude': 'Jude', 'Revelation': 'Rev',
+};
+
 // Returns an array of individual verse results (splits ranges and comma-separated verses)
 function parseRefs(raw) {
   const s = raw.trim();
@@ -66,6 +86,9 @@ function parseRef(raw) {
   const actualEnd = startVerse + texts.length - 1;
   let ref = `${canonicalBook} ${chapter}:${startVerse}`;
   if (actualEnd > startVerse) ref += `\u2013${actualEnd}`;
+  const abbrev = ABBREVS[canonicalBook] || canonicalBook;
+  let shortRef = `${abbrev} ${chapter}:${startVerse}`;
+  if (actualEnd > startVerse) shortRef += `\u2013${actualEnd}`;
 
-  return { text: texts.join(' '), reference: ref };
+  return { text: texts.join(' '), reference: ref, shortRef };
 }
