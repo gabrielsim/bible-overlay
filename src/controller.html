@@ -377,6 +377,26 @@
                     />
                     <label id="size-label">45px</label>
                 </div>
+                <div class="screen-row">
+                    <label>Bold text</label>
+                    <input type="checkbox" id="bold-toggle" style="width:18px;height:18px;cursor:pointer;" />
+                </div>
+                <div class="screen-row">
+                    <label>Verse font</label>
+                    <select id="font-select">
+                        <option value='"EB Garamond", Georgia, serif'>EB Garamond</option>
+                        <option value='"Lora", Georgia, serif'>Lora</option>
+                        <option value='"Playfair Display", Georgia, serif'>Playfair Display</option>
+                        <option value='"Merriweather", Georgia, serif'>Merriweather</option>
+                        <option value='"Crimson Text", Georgia, serif'>Crimson Text</option>
+                        <option value='"Libre Baskerville", Georgia, serif'>Libre Baskerville</option>
+                        <option value='"Cormorant Garamond", Georgia, serif'>Cormorant Garamond</option>
+                        <option value='"Gentium Book Plus", Georgia, serif'>Gentium Book Plus</option>
+                        <option value='"Source Serif 4", Georgia, serif'>Source Serif 4</option>
+                        <option value='Georgia, serif'>Georgia</option>
+                        <option value='Calibri, sans-serif'>Calibri</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -533,6 +553,30 @@
                 document.getElementById("size-label").textContent = savedSize + "px";
                 window.electronAPI.sendCommand({ type: "size", value: parseInt(savedSize) });
             }
+
+            // ── Bold ───────────────────────────────────────────────────────────────────
+            const savedBold = localStorage.getItem("verseBold") === "true";
+            document.getElementById("bold-toggle").checked = savedBold;
+            if (savedBold) window.electronAPI.sendCommand({ type: "bold", value: true });
+
+            document.getElementById("bold-toggle").addEventListener("change", function () {
+                localStorage.setItem("verseBold", this.checked);
+                window.electronAPI.sendCommand({ type: "bold", value: this.checked });
+            });
+
+            // ── Font ───────────────────────────────────────────────────────────────────
+            const savedFont = localStorage.getItem("verseFont");
+            if (savedFont) {
+                document.getElementById("font-select").value = savedFont;
+                window.electronAPI.sendCommand({ type: "font", value: savedFont });
+            }
+
+            document
+                .getElementById("font-select")
+                .addEventListener("change", function () {
+                    localStorage.setItem("verseFont", this.value);
+                    window.electronAPI.sendCommand({ type: "font", value: this.value });
+                });
 
             document
                 .getElementById("size-slider")

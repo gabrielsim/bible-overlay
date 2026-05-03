@@ -85,6 +85,8 @@ ipcMain.on('overlay-command', (event, msg) => {
     case 'hide':
     case 'clear':
     case 'size':
+    case 'font':
+    case 'bold':
     case 'position':
       displayWin.webContents.send('overlay-command', msg);
       break;
