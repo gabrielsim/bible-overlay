@@ -13,11 +13,12 @@ function createWindows() {
   const secondaryDisplay = displays.find(d => d.id !== primaryDisplay.id) || primaryDisplay;
 
   // ── Controller Window ─────────────────────────────────────────────────────
+  const workArea = primaryDisplay.workArea;
   controllerWin = new BrowserWindow({
-    x: primaryDisplay.bounds.x + 40,
-    y: primaryDisplay.bounds.y + 40,
+    x: workArea.x,
+    y: workArea.y,
     width: 500,
-    height: 820,
+    height: workArea.height,
     minWidth: 420,
     minHeight: 600,
     title: 'Bible Overlay — Controller',
