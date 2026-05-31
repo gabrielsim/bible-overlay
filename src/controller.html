@@ -596,7 +596,7 @@
                     (v) => v.reference !== verse.reference,
                 );
                 loadedVerses.unshift(verse);
-                if (loadedVerses.length > 30) loadedVerses.pop();
+                if (loadedVerses.length > 1000) loadedVerses.pop();
                 renderLoaded();
             }
             function renderLoaded() {
