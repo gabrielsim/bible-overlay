@@ -607,8 +607,8 @@
                     div.className =
                         "ri" +
                         (verseVisible &&
-                        currentVerse &&
-                        currentVerse.reference === v.reference
+                        displayedVerse &&
+                        displayedVerse.reference === v.reference
                             ? " active"
                             : "");
                     div.innerHTML = `<span class="ri-ref">${v.shortRef}</span><span class="ri-preview">${v.text}</span>`;
