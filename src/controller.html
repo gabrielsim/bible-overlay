@@ -592,9 +592,6 @@
 
             // ── Loaded Verses ──────────────────────────────────────────────────────────
             function addToLoaded(verse) {
-                loadedVerses = loadedVerses.filter(
-                    (v) => v.reference !== verse.reference,
-                );
                 loadedVerses.unshift(verse);
                 if (loadedVerses.length > 1000) loadedVerses.pop();
                 renderLoaded();
