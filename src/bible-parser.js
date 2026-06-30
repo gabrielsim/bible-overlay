@@ -59,7 +59,14 @@ function parseRef(raw) {
   const chapter = parseInt(m[2]);
   const versePart = m[3] || null;
 
-  const canonicalBook = ALIASES[bookRaw];
+  let canonicalBook = ALIASES[bookRaw];
+  if (!canonicalBook) {
+    // Fallback: accept an input that is a unique prefix of exactly one book name
+    // (spaces ignored, so "1cor" and "1 cor" both work). Ambiguous or no match → not found.
+    const key = bookRaw.replace(/\s+/g, '');
+    const matches = Object.keys(KJV).filter(b => b.toLowerCase().replace(/\s+/g, '').startsWith(key));
+    if (matches.length === 1) canonicalBook = matches[0];
+  }
   if (!canonicalBook || !KJV[canonicalBook]) return null;
 
   const chData = KJV[canonicalBook][String(chapter)];
