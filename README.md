@@ -88,6 +88,14 @@ bible-overlay/
 
 ---
 
+## Bible Text Source
+
+The verse text is the **King James Version (Authorized Version), Pure Cambridge Edition (PCE)**, sourced from [bibleprotector.com](https://www.bibleprotector.com/TEXT-PCE-127.txt). All 66 books — 1,189 chapters, 31,102 verses — are bundled in `src/bible-data.js`.
+
+Words supplied by the translators (not in the original Hebrew/Greek) are kept in `[square brackets]`. Psalm superscriptions (e.g. *"A Psalm of David"*) and the editorial epistle subscriptions are omitted so only the verse text is displayed.
+
+---
+
 ## Troubleshooting
 
 **Display on wrong screen** → Expand Display Settings and use the "Projector on" dropdown.

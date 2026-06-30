@@ -6,7 +6,7 @@ const ABBREVS = {
   'Deuteronomy': 'Deut.', 'Joshua': 'Josh.', 'Judges': 'Judg.', 'Ruth': 'Ruth',
   '1 Samuel': '1 Sam.', '2 Samuel': '2 Sam.', '1 Kings': '1 Kings', '2 Kings': '2 Kings',
   '1 Chronicles': '1 Chron.', '2 Chronicles': '2 Chron.', 'Ezra': 'Ezra', 'Nehemiah': 'Neh.',
-  'Esther': 'Est.', 'Job': 'Job', 'Psalms': 'Ps.', 'Proverbs': 'Prov',
+  'Esther': 'Est.', 'Job': 'Job', 'Psalm': 'Ps.', 'Proverbs': 'Prov',
   'Ecclesiastes': 'Eccles.', 'Song of Solomon': 'Song', 'Isaiah': 'Isa.',
   'Jeremiah': 'Jer.', 'Lamentations': 'Lam.', 'Ezekiel': 'Ezek.', 'Daniel': 'Dan.',
   'Hosea': 'Hos.', 'Joel': 'Joel', 'Amos': 'Amos', 'Obadiah': 'Obad.',
